@@ -7,6 +7,7 @@ import logging
 import sys
 import typing as t
 from pathlib import Path
+import shlex
 from wsgiref.simple_server import WSGIRequestHandler
 
 import functools as ft
@@ -129,6 +130,7 @@ def main(argv: t.Sequence[str] = None) -> None:
         argv = sys.argv[1:]
 
     config = Config.from_args(argv)
+    extra_kwargs = {}
 
     init_logging(
         level=config.log_level,
@@ -193,11 +195,16 @@ def main(argv: t.Sequence[str] = None) -> None:
             expected_server.name,
             extra_kwargs,
         )
-    else:
-        extra_kwargs = wsgi_kwargs if config.server_method == "wsgiref" else {}
-        log.debug(
-            "Running bottle with selected server '%s'", config.server_method
-        )
+    elif config.server_method == "wsgiref":
+        extra_kwargs = wsgi_kwargs
+
+    log.debug(
+        "Running bottle with selected server '%s'", config.server_method
+    )
+
+    if config.server_opts:
+        sys.argv[1:] = shlex.split(config.server_opts.strip("'\""))
+
 
     bottle.run(
         app=app,

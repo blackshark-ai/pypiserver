@@ -87,6 +87,7 @@ class DEFAULTS:
     PACKAGE_DIRECTORIES = [pathlib.Path("~/packages").expanduser().resolve()]
     PORT = 8080
     SERVER_METHOD = "auto"
+    SERVER_OPTS = ""
     BACKEND = "auto"
 
 
@@ -427,6 +428,14 @@ def get_parser() -> argparse.ArgumentParser:
         ),
     )
     run_parser.add_argument(
+        "--server-opts",
+        default=DEFAULTS.SERVER_OPTS,
+        type=str.lower,
+        help=(
+            "Server opts args to pass to server."
+        ),
+    )
+    run_parser.add_argument(
         "-o",
         "--overwrite",
         action="store_true",
@@ -683,6 +692,7 @@ class RunConfig(_ConfigCommon):
         fallback_url: str,
         health_endpoint: str,
         server_method: str,
+        server_opts: str,
         overwrite: bool,
         welcome_msg: str,
         cache_control: t.Optional[int],
@@ -702,6 +712,7 @@ class RunConfig(_ConfigCommon):
         self.fallback_url = fallback_url
         self.health_endpoint = health_endpoint
         self.server_method = server_method
+        self.server_opts = server_opts
         self.overwrite = overwrite
         self.welcome_msg = welcome_msg
         self.cache_control = cache_control
@@ -727,6 +738,7 @@ class RunConfig(_ConfigCommon):
             "fallback_url": namespace.fallback_url,
             "health_endpoint": namespace.health_endpoint,
             "server_method": namespace.server,
+            "server_opts": namespace.server_opts,
             "overwrite": namespace.overwrite,
             "welcome_msg": namespace.welcome,
             "cache_control": namespace.cache_control,
